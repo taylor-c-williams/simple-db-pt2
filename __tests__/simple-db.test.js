@@ -8,7 +8,8 @@ const BASE_DIR = CI ? HOME : __dirname;
 const TEST_DIR = path.join(BASE_DIR, 'test-dir');
 
 describe('simple database', () => {
-  const newDB = new SimpleDB(TEST_DIR);
+  const rootDir = './__tests__/test-dir';
+  const newDB = new SimpleDB(rootDir);
 
   beforeEach(async () => {
     await fs.rm(TEST_DIR, { force: true, recursive: true });
@@ -54,7 +55,7 @@ describe('simple database', () => {
     return newDB
       .save(object)
       .then(() => newDB.delete(object.id))
-      .then(() => fs.readdir(TEST_DIR))
+      .then(() => fs.readdir(rootDir))
       .then((fileDir) => {
         expect(fileDir).not.toEqual(object);
       });
@@ -67,7 +68,7 @@ describe('simple database', () => {
     return newDB
       .save(object)
       .then(() => newDB.delete(wrongId))
-      .then(() => fs.readdir(TEST_DIR))
+      .then(() => fs.readdir(rootDir))
       .then((fileDir) => {
         expect(fileDir).not.toThrowError;
       });
