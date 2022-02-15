@@ -33,13 +33,12 @@ describe('simple database', () => {
   });
 
   // Get All
-  it('Returns an array of all objects within the directory', () => {
+  it('Returns an array of all objects within the directory', async () => {
     const expected = [
       { anArray: 'of objects', id: expect.any(String) },
       { likeSo: 'another object', id: expect.any(String) },
     ];
-    return newDB
-      .save({ anArray: 'of objects' })
+    await newDB.save({ anArray: 'of objects' })
       .then(() => newDB.save({ likeSo: 'another object' }))
       .then(() => newDB.getAll())
       .then((arrayOfObjects) =>
