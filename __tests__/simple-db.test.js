@@ -1,3 +1,5 @@
+const { captureRejections } = require('events');
+const { copyFile } = require('fs');
 const fs = require('fs/promises');
 const path = require('path');
 const SimpleDB = require('../lib/simple-db');
@@ -25,4 +27,14 @@ describe('simple database', () => {
         expect(newObj).toEqual(object);
       });
   });
+
+  it('Returns error message if enoent', () => {
+    const wrongId = 1;
+    try {
+      return newDB.get(wrongId);
+    } catch (err){
+      expect(err.message).toMatch('not found!');}
+  });
+
+
 });
