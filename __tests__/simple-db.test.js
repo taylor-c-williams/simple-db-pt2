@@ -16,15 +16,13 @@ describe('simple database', () => {
   });
 
   // Save & Get by ID
-  it('Saves an object, then gets that object by id', () => {
+  it('Saves an object, then gets that object by id', async () => {
     const object = { words: 'this is a string' };
-    return newDB
-      .save(object)
-      .then(() => newDB.get(object.id))
-      .then((newObj) => {
-        expect(newObj).toEqual(object);
-      });
+    await newDB.save(object);
+    const file =  await newDB.get(object.id);
+    expect(file).toEqual(object);
   });
+
 
   // Error Handling
   it('Uses custom error handling message', async () => {
