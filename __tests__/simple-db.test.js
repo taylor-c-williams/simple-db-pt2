@@ -1,5 +1,3 @@
-const { captureRejections } = require('events');
-const { copyFile } = require('fs');
 const fs = require('fs/promises');
 const path = require('path');
 const SimpleDB = require('../lib/simple-db');
@@ -18,7 +16,8 @@ describe('simple database', () => {
     await fs.mkdir(TEST_DIR, { recursive: true });
   });
 
-  it('Creates and saves an object', () => {
+  // Save & Get by ID
+  it('Saves an object, then gets that object by id', () => {
     const object = { words: 'this is a string' };
     return newDB
       .save(object)
@@ -28,13 +27,54 @@ describe('simple database', () => {
       });
   });
 
-  it('Returns error message if enoent', () => {
-    const wrongId = 1;
+  // Error Handling
+  it('Uses custom error handling message', async () => {
     try {
-      return newDB.get(wrongId);
-    } catch (err){
-      expect(err.message).toMatch('not found!');}
+      await newDB.get(1);
+    } catch (err) {
+      expect(err.message).toContain('not found!');
+    }
   });
 
+  // Get All
+  it('Returns an array of all objects within the directory', () => {
+    const expected = [
+      { anArray: 'of objects', id: expect.any(String) },
+      { likeSo: 'another object', id: expect.any(String) },
+    ];
+    return newDB
+      .save({ anArray: 'of objects' })
+      .then(() => newDB.save({ likeSo: 'another object' }))
+      .then(() => newDB.getAll())
+      .then((arrayOfObjects) =>
+        expect(arrayOfObjects).toEqual(expect.arrayContaining(expected))
+      );
+  });
+
+  // Delete(id)
+  it('Removes a file by id', () => {
+    const object = { words: 'this is a string' };
+    return newDB
+      .save(object)
+      .then(() => newDB.delete(object.id))
+      .then(() => fs.readdir(rootDir))
+      .then((fileDir) => {
+        expect(fileDir).not.toEqual(object);
+      });
+  });
+
+  it('Does not throw an error if no such file exists', () => {
+    const object = { 
+      words: 'this is a string' };
+    const wrongId = `${object.id}1`;
+    return newDB
+      .save(object)
+      .then(() => newDB.delete(wrongId))
+      .then(() => fs.readdir(rootDir))
+      .then((fileDir) => {
+        expect(fileDir).not.toThrowError;
+      });
+      
+  });
 
 });
